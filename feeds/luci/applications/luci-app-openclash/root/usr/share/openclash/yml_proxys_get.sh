@@ -590,6 +590,32 @@ do
                   system(custom)
                end
             end
+            #ws-opts-path:
+            if Value['proxies'][$count].key?('ws-opts') then
+               if Value['proxies'][$count]['ws-opts'].key?('path') then
+                  ws_opts_path = '${uci_set}ws_opts_path=\"' + Value['proxies'][$count]['ws-opts']['path'].to_s + '\"'
+                  system(ws_opts_path)
+               end
+               #ws-opts-headers:
+               if Value['proxies'][$count]['ws-opts'].key?('headers') then
+                  system '${uci_del}ws_opts_headers >/dev/null 2>&1'
+                  Value['proxies'][$count]['ws-opts']['headers'].keys.each{
+                  |v|
+                     ws_opts_headers = '${uci_add}ws_opts_headers=\"' + v.to_s + ': '+ Value['proxies'][$count]['ws-opts']['headers'][v].to_s + '\"'
+                     system(ws_opts_headers)
+                  }
+               end
+               #max-early-data:
+               if Value['proxies'][$count]['ws-opts'].key?('max-early-data') then
+                  max_early_data = '${uci_set}max_early_data=\"' + Value['proxies'][$count]['ws-opts']['max-early-data'].to_s + '\"'
+                  system(max_early_data)
+               end
+               #early-data-header-name:
+               if Value['proxies'][$count]['ws-opts'].key?('early-data-header-name') then
+                  early_data_header_name = '${uci_set}early_data_header_name=\"' + Value['proxies'][$count]['ws-opts']['early-data-header-name'].to_s + '\"'
+                  system(early_data_header_name)
+               end
+            end
          elsif Value['proxies'][$count]['network'].to_s == 'http'
             system '${uci_set}obfs_vmess=http'
             if Value['proxies'][$count].key?('http-opts') then
@@ -624,7 +650,7 @@ do
                   }
                end
                if Value['proxies'][$count]['h2-opts'].key?('path') then
-                  h2_path = '${uci_set}h2_path=\"' + Value['proxies'][$count]['h2-opts']['host'].to_s + '\"'
+                  h2_path = '${uci_set}h2_path=\"' + Value['proxies'][$count]['h2-opts']['path'].to_s + '\"'
                   system(h2_path)
                end
             end
@@ -728,9 +754,30 @@ do
       Thread.new{
       #grpc-service-name
       if Value['proxies'][$count].key?('grpc-opts') then
+         system '${uci_set}obfs_trojan=grpc'
          if Value['proxies'][$count]['grpc-opts'].key?('grpc-service-name') then
             grpc_service_name = '${uci_set}grpc_service_name=\"' + Value['proxies'][$count]['grpc-opts']['grpc-service-name'].to_s + '\"'
             system(grpc_service_name)
+         end
+      end
+      }.join
+      
+      Thread.new{
+      if Value['proxies'][$count].key?('ws-opts') then
+      system '${uci_set}obfs_trojan=ws'
+      #trojan_ws_path
+         if Value['proxies'][$count]['ws-opts'].key?('path') then
+            trojan_ws_path = '${uci_set}trojan_ws_path=\"' + Value['proxies'][$count]['ws-opts']['path'].to_s + '\"'
+            system(trojan_ws_path)
+         end
+      #trojan_ws_headers
+         if Value['proxies'][$count]['ws-opts'].key?('headers') then
+            system '${uci_del}trojan_ws_headers >/dev/null 2>&1'
+            Value['proxies'][$count]['ws-opts']['headers'].keys.each{
+            |v|
+               trojan_ws_headers = '${uci_add}trojan_ws_headers=\"' + v.to_s + ': '+ Value['proxies'][$count]['ws-opts']['headers'][v].to_s + '\"'
+               system(trojan_ws_headers)
+            }
          end
       end
       }.join

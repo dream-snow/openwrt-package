@@ -67,6 +67,7 @@ o:depends("type", "load-balance")
 
 o = s:option(Value, "name", translate("Group Name"))
 o.rmempty = false
+o.default = "Group - "..sid
 
 o = s:option(ListValue, "disable_udp", translate("Disable UDP"))
 o:value("false", translate("Disable"))
@@ -112,7 +113,7 @@ local t = {
 a = m:section(Table, t)
 
 o = a:option(Button,"Commit", " ")
-o.inputtitle = translate("Commit Configurations")
+o.inputtitle = translate("Commit Settings")
 o.inputstyle = "apply"
 o.write = function()
    m.uci:commit(openclash)
@@ -121,7 +122,7 @@ o.write = function()
 end
 
 o = a:option(Button,"Back", " ")
-o.inputtitle = translate("Back Configurations")
+o.inputtitle = translate("Back Settings")
 o.inputstyle = "reset"
 o.write = function()
    m.uci:revert(openclash, sid)

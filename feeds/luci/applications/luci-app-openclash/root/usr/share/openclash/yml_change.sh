@@ -48,16 +48,6 @@ if [ "$(ruby_read "$7" "['secret']")" != "$4" ]; then
 fi
 uci commit openclash
 
-if [ "$2" = "fake-ip" ]; then
-   if [ ! -f "/tmp/openclash_fake_filter.list" ] || [ ! -z "$(grep "config servers" /etc/config/openclash 2>/dev/null)" ]; then
-      /usr/share/openclash/openclash_fake_filter.sh
-   fi
-   if [ -s "/tmp/openclash_servers_fake_filter.conf" ]; then
-      mkdir -p /tmp/dnsmasq.d
-      ln -s /tmp/openclash_servers_fake_filter.conf /tmp/dnsmasq.d/dnsmasq_openclash.conf
-   fi
-fi
-
 ruby -ryaml -E UTF-8 -e "
 begin
    Value = YAML.load_file('$7');
@@ -66,6 +56,7 @@ rescue Exception => e
 end
 begin
    Value['redir-port']=$6;
+   Value['tproxy-port']=${20};
    Value['port']=$9;
    Value['socks-port']=${10};
    Value['mixed-port']=${19};
@@ -83,11 +74,14 @@ else
    Value['dns']['enable']=true
 end;
 if $8 == 1 then
-   Value['dns']['ipv6']=true
    Value['ipv6']=true
 else
-   Value['dns']['ipv6']=false
    Value['ipv6']=false
+end;
+if ${21} == 1 then
+   Value['dns']['ipv6']=true
+else
+   Value['dns']['ipv6']=false
 end;
 Value['dns']['enhanced-mode']='$2';
 if '$2' == 'fake-ip' then
@@ -95,7 +89,7 @@ if '$2' == 'fake-ip' then
 else
    Value['dns'].delete('fake-ip-range')
 end;
-if $8 != 1 then
+if ${21} != 1 then
    Value['dns']['listen']='127.0.0.1:${17}'
 else
    Value['dns']['listen']='0.0.0.0:${17}'
@@ -108,7 +102,7 @@ if $en_mode_tun == 1 or $en_mode_tun == 3 then
    Value['tun'].merge!(Value_2)
 elsif $en_mode_tun == 2
    Value['tun']=Value_2['tun']
-   Value['tun']['device-url']='dev://clash0'
+   Value['tun']['device-url']='dev://utun'
    Value['tun']['dns-listen']='0.0.0.0:53'
 elsif $en_mode_tun == 0
    if Value.key?('tun') then
@@ -120,6 +114,11 @@ if not Value.key?('profile') then
    Value['profile']=Value_3['profile']
 else
    Value['profile']['store-selected']=true
+end;
+if ${22} != 1 then
+   Value['profile']['store-fakeip']=false
+else
+   Value['profile']['store-fakeip']=true
 end;
 rescue Exception => e
 puts '${LOGTIME} Error: Set General Error,【' + e.message + '】'
@@ -152,12 +151,20 @@ if '$2' == 'fake-ip' then
         if Value['dns'].has_key?('fake-ip-filter') and not Value['dns']['fake-ip-filter'].to_a.empty? then
            Value_5 = Value_4['fake-ip-filter'].reverse!
            Value_5.each{|x| Value['dns']['fake-ip-filter'].insert(-1,x)}
-           Value['dns']['fake-ip-filter']=Value['dns']['fake-ip-filter'].uniq
         else
            Value['dns']['fake-ip-filter']=Value_4['fake-ip-filter']
         end
+        Value['dns']['fake-ip-filter']=Value['dns']['fake-ip-filter'].uniq
      end
-  end
+   end
+   if ${23} == 1 then
+      if Value['dns'].has_key?('fake-ip-filter') and not Value['dns']['fake-ip-filter'].to_a.empty? then
+         Value['dns']['fake-ip-filter'].insert(-1,'+.nflxvideo.net')
+         Value['dns']['fake-ip-filter']=Value['dns']['fake-ip-filter'].uniq
+      else
+         Value['dns'].merge!({'fake-ip-filter'=>['+.nflxvideo.net']})
+      end
+   end
 end;
 rescue Exception => e
 puts '${LOGTIME} Error: Set Fake-IP-Filter Error,【' + e.message + '】'

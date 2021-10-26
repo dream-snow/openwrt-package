@@ -52,6 +52,7 @@ end
 
 o = s:option(Value, "name", translate("Rule Providers Name"))
 o.rmempty = false
+o.default = "Rule-provider - "..sid
 
 o = s:option(ListValue, "type", translate("Rule Providers Type"))
 o.rmempty = true
@@ -74,9 +75,7 @@ for t,f in ipairs(fs.glob("/etc/openclash/rule_provider/*"))do
 	if h then
     p[t]={}
     p[t].name=fs.basename(f)
-    if IsYamlFile(p[t].name) or IsYmlFile(p[t].name) then
-       o:value("./rule_provider/"..p[t].name)
-    end
+    o:value("./rule_provider/"..p[t].name)
   end
 end
 o.rmempty = false
@@ -109,7 +108,7 @@ local t = {
 a = m:section(Table, t)
 
 o = a:option(Button,"Commit", " ")
-o.inputtitle = translate("Commit Configurations")
+o.inputtitle = translate("Commit Settings")
 o.inputstyle = "apply"
 o.write = function()
    m.uci:commit(openclash)
@@ -118,7 +117,7 @@ o.write = function()
 end
 
 o = a:option(Button,"Back", " ")
-o.inputtitle = translate("Back Configurations")
+o.inputtitle = translate("Back Settings")
 o.inputstyle = "reset"
 o.write = function()
    m.uci:revert(openclash, sid)

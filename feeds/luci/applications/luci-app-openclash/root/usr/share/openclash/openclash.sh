@@ -70,7 +70,7 @@ config_cus_up()
 	fi
 	if [ -z "$subscribe_url_param" ]; then
 	   if [ -n "$key_match_param" ] || [ -n "$key_ex_match_param" ]; then
-	      LOG_OUT "Config file【$name】is Replaced Successfully, Start Picking Nodes..."	      
+	      LOG_OUT "Config File【$name】is Replaced Successfully, Start Picking Nodes..."	      
 	      ruby -ryaml -E UTF-8 -e "
 	      begin
 	         Value = YAML.load_file('$CONFIG_FILE');
@@ -193,7 +193,7 @@ config_su_check()
       else
          LOG_OUT "Config File【$name】No Change, Do Nothing!"
          rm -rf "$CFG_FILE"
-         sleep 5
+         sleep 3
          SLOG_CLEAN
       fi
    else
@@ -214,7 +214,7 @@ config_error()
 {
    LOG_OUT "Error:【$name】Update Error, Please Try Again Later..."
    rm -rf "$CFG_FILE" 2>/dev/null
-   sleep 5
+   sleep 3
    SLOG_CLEAN
 }
 
@@ -232,9 +232,11 @@ change_dns()
          uci commit dhcp
          /etc/init.d/dnsmasq restart >/dev/null 2>&1
       fi
+      iptables -t nat -D OUTPUT -j openclash_output >/dev/null 2>&1
+      iptables -t mangle -D OUTPUT -j openclash_output >/dev/null 2>&1
       iptables -t nat -I OUTPUT -j openclash_output >/dev/null 2>&1
       iptables -t mangle -I OUTPUT -j openclash_output >/dev/null 2>&1
-      nohup /usr/share/openclash/openclash_watchdog.sh &
+      [ "$(unify_ps_status "openclash_watchdog.sh")" -eq 0 ] && [ "$(unify_ps_prevent)" -eq 0 ] && nohup /usr/share/openclash/openclash_watchdog.sh &
    fi
 }
 
@@ -248,15 +250,18 @@ field_name_check()
             Value['proxies'] = Value['Proxy']
             Value.delete('Proxy')
             puts '${LOGTIME} Warning: Proxy is no longer used. Auto replaced by proxies'
-         elsif Value.key?('Proxy Group') then
+         end
+         if Value.key?('Proxy Group') then
             Value['proxy-groups'] = Value['Proxy Group']
             Value.delete('Proxy Group')
             puts '${LOGTIME} Warning: Proxy Group is no longer used. Auto replaced by proxy-groups'
-         elsif Value.key?('Rule') then
+         end
+         if Value.key?('Rule') then
             Value['rules'] = Value['Rule']
             Value.delete('Rule')
             puts '${LOGTIME} Warning: Rule is no longer used. Auto replaced by rules'
-         elsif Value.key?('rule-provider') then
+         end
+         if Value.key?('rule-provider') then
             Value['rule-providers'] = Value['rule-provider']
             Value.delete('rule-provider')
              puts '${LOGTIME} Warning: rule-provider is no longer used. Auto replaced by rule-providers'
