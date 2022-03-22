@@ -28,7 +28,6 @@ luci-app-gowebdav
 luci-app-iptvhelper
 luci-app-koolddns
 luci-app-linkease
-luci-app-mentohust
 luci-app-mosdns
 luci-app-netdata
 luci-app-oaf
@@ -42,13 +41,13 @@ luci-app-rebootschedule
 luci-app-serverchan
 luci-app-switch-lan-play
 luci-app-tencentddns
+luci-app-ttyd
 luci-app-udp2raw
 luci-app-unblockneteasemusic
 luci-app-vssr
 luci-app-wifidog
 luci-app-wolplus
 luci-app-wrtbwmon
-mentohust
 netdata
 openwrt-subconverter
 openwrt-tmate
