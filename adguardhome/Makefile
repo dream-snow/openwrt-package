@@ -48,7 +48,7 @@ endef
 
 define Package/adguardhome/conffiles
 /etc/config/adguardhome
-/etc/config/adguardhome.yaml
+/etc/config/AdGuardHome.yaml
 endef
 
 define Package/adguardhome/description
