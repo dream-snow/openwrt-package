@@ -814,7 +814,7 @@ summary {
 
 html,body {
 	height: 100%;
-	font-size: 14px;
+	font-size: rem;
 	font-family: var(--font-family-sans-serif);
 	margin: 0px;
 	padding: 0px
