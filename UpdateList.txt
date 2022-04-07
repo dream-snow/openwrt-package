@@ -42,6 +42,7 @@ luci-app-openclash
 luci-app-oscam
 luci-app-poweroff
 luci-app-pushbot
+luci-app-quickstart
 luci-app-rebootschedule
 luci-app-serverchan
 luci-app-store
@@ -60,6 +61,7 @@ netdata
 openwrt-subconverter
 openwrt-tmate
 openwrt_oscam
+quickstart
 redsocks2
 smartdns
 smartmontools
