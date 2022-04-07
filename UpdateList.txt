@@ -17,6 +17,7 @@ luci-app-mosdns
 luci-app-netdata
 luci-app-poweroff
 luci-app-pushbot
+luci-app-quickstart
 luci-app-rebootschedule
 luci-app-store
 luci-app-tencentddns
@@ -25,4 +26,5 @@ luci-app-wifidog
 luci-app-wolplus
 luci-theme-argon
 netdata
+quickstart
 wifidog-wiwiz
